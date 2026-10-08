@@ -3,226 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>അഭിയുടെ കട | @abhiiiyyeee._</title>
+    <title>അഭിയുടെ കട | THE VAULT</title>
+    
+    <!-- Scripts -->
+    <script defer src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&family=Playfair+Display:ital,wght@0,900;1,900&family=Inter:wght@300;400;800&display=swap" rel="stylesheet">
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Manjari:wght@100;400;700&family=Playfair+Display:ital,wght@0,900;1,900&family=Inter:wght@300;400;900&display=swap" rel="stylesheet">
     
     <style>
-        :root {
-            --accent: #ff3e00; 
-            --dark: #050505;
-        }
-
-        body {
-            background-color: var(--dark);
-            color: #fff;
-            font-family: 'Inter', sans-serif;
-            overflow-x: hidden;
-        }
-
-        .malayalam-brand { font-family: 'Manjari', sans-serif; }
-        .hero-title { font-family: 'Playfair Display', serif; font-size: clamp(4rem, 15vw, 12rem); line-height: 0.8; }
-
-        .cinematic-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100vh;
-            z-index: -1;
-            filter: brightness(0.3) contrast(1.1);
-            transition: transform 1s ease-out;
-        }
-
-        .glass-ui {
-            background: rgba(255, 255, 255, 0.02);
-            backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        .noise-overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: url('https://grainy-gradients.vercel.app/noise.svg');
-            opacity: 0.05;
-            pointer-events: none;
-            z-index: 100;
-        }
-
-        /* Animated Underline */
-        .hover-link {
-            position: relative;
-            text-decoration: none;
-        }
-        .hover-link::after {
-            content: '';
-            position: absolute;
-            width: 0; height: 2px;
-            bottom: -4px; left: 0;
-            background-color: var(--accent);
-            transition: width 0.4s ease;
-        }
-        .hover-link:hover::after { width: 100%; }
-
+        :root { --accent: #ff3e00; --dark: #050505; --glass: rgba(255, 255, 255, 0.03); }
+        body { background-color: var(--dark); color: #fff; font-family: 'Inter', sans-serif; overflow-x: hidden; }
+        .malayalam { font-family: 'Manjari', sans-serif; }
+        .hero-font { font-family: 'Playfair Display', serif; }
+        
+        .cinematic-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100vh; z-index: -1; filter: brightness(0.2); }
+        .glass-panel { background: var(--glass); backdrop-filter: blur(30px); border: 1px solid rgba(255,255,255,0.1); }
+        
         /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 3px; }
+        ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: var(--accent); }
+
+        .cart-sidebar { transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+        [x-cloak] { display: none !important; }
     </style>
 </head>
-<body>
+<body x-data="shop" x-cloak>
 
-    <div class="noise-overlay"></div>
+    <!-- CINEMATIC BACKGROUND -->
+    <div class="cinematic-bg" :style="'background: url(' + bgImage + ') center/cover; transition: 1s;'"></div>
 
-    <!-- Background Layer -->
-    <div class="cinematic-bg" id="main-bg" style="background: url('https://images.unsplash.com/photo-1514463738911-56b6a0468071?auto=format&fit=crop&q=80&w=2000') center/cover;"></div>
-
-    <!-- Navigation -->
-    <nav class="fixed top-0 w-full z-[1000] p-8 flex justify-between items-center mix-blend-difference">
+    <!-- NAVIGATION -->
+    <nav class="fixed top-0 w-full z-[1000] p-6 flex justify-between items-center mix-blend-difference">
         <div class="flex flex-col">
-            <span class="malayalam-brand text-3xl font-bold tracking-tighter">അഭിയുടെ കട</span>
-            <span class="text-[9px] tracking-[0.6em] uppercase opacity-50">Studio Elite</span>
+            <span class="malayalam text-3xl font-bold">അഭിയുടെ കട</span>
+            <span class="text-[9px] tracking-[0.5em] opacity-60 uppercase">High-End Streetwear</span>
         </div>
-        <div class="hidden md:flex gap-12 text-[10px] uppercase tracking-[0.3em] font-bold">
-            <a href="#sneakers" class="hover-link">Sneakers</a>
-            <a href="#hoodies" class="hover-link">Apparel</a>
-            <a href="https://www.instagram.com/abhiiiyyeee._/" target="_blank" class="text-orange-500">Instagram</a>
+        <div class="hidden lg:flex gap-8 text-[10px] font-bold uppercase tracking-widest">
+            <template x-for="cat in categories">
+                <button @click="filter = cat; bgImage = catImages[cat]" 
+                        :class="filter === cat ? 'text-orange-500' : 'text-white'" 
+                        class="hover:text-orange-500 transition" x-text="cat"></button>
+            </template>
         </div>
-        <div class="text-[10px] font-bold tracking-widest border border-white/20 px-4 py-2">
-            CART [0]
-        </div>
+        <button @click="cartOpen = true" class="relative glass-panel px-6 py-3 text-[10px] font-black tracking-widest">
+            BAG (<span x-text="cart.length"></span>)
+        </button>
     </nav>
 
-    <!-- Hero Section -->
-    <section class="h-screen flex items-center px-[8%] relative">
-        <div class="z-10">
-            <p class="text-orange-600 font-bold tracking-[.8em] text-[11px] mb-6 reveal">NIKE • ADIDAS • EXCLUSIVE</p>
-            <h1 class="hero-title reveal">ABHIYUDE<br><span class="italic text-transparent" style="-webkit-text-stroke: 1.5px white;">KADA.</span></h1>
-            <div class="mt-14 flex gap-8 reveal">
-                <button class="px-12 py-5 bg-white text-black font-black text-[10px] uppercase tracking-[0.3em] hover:bg-orange-600 hover:text-white transition-all duration-500">See Collection</button>
-                <a href="https://www.instagram.com/abhiiiyyeee._/" target="_blank" class="px-12 py-5 border border-white/20 text-white font-black text-[10px] uppercase tracking-[0.3em] hover:bg-white hover:text-black transition-all duration-500">Follow Drop</a>
-            </div>
+    <!-- HERO SECTION -->
+    <section class="h-screen flex items-center px-[8%]">
+        <div id="hero-content">
+            <p class="text-orange-600 font-bold tracking-[.8em] text-[11px] mb-4">ESTABLISHED 2024</p>
+            <h1 class="hero-font text-[clamp(4rem,12vw,10rem)] leading-[0.8] uppercase mb-6">
+                THE<br><span class="italic text-transparent" style="-webkit-text-stroke: 1.5px white;">VAULT.</span>
+            </h1>
+            <p class="malayalam text-2xl opacity-70">ഏറ്റവും മികച്ച സ്നീക്കറുകൾ, ഇപ്പോൾ നിങ്ങളുടെ കൈപ്പിടിയിൽ.</p>
         </div>
     </section>
 
-    <!-- Sneakers Section -->
-    <section id="sneakers" class="py-40 px-[8%]">
-        <div class="mb-24">
-            <h2 class="text-8xl font-black uppercase italic tracking-tighter leading-none">The<br>Grails</h2>
-            <p class="malayalam-brand text-orange-500 text-3xl mt-4">സ്നീക്കർ ശേഖരം</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-16">
-            <!-- Nike Item -->
-            <div class="glass-ui p-8 group cursor-pointer">
-                <div class="relative overflow-hidden aspect-square mb-8">
-                    <img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?auto=format&fit=crop&q=80&w=1000" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
-                    <div class="absolute bottom-0 left-0 p-6 w-full bg-gradient-to-t from-black/80 to-transparent">
-                        <span class="text-[10px] font-bold tracking-widest bg-orange-600 px-3 py-1">LIMITED DROP</span>
-                    </div>
-                </div>
-                <div class="flex justify-between items-end">
-                    <div>
-                        <h3 class="text-2xl font-bold uppercase tracking-tighter">Nike Air Jordan 1 Low</h3>
-                        <p class="text-xs opacity-40 uppercase tracking-widest mt-2">Authentic Series</p>
-                    </div>
-                    <p class="text-2xl font-light">$210</p>
-                </div>
-            </div>
-
-            <!-- Adidas Item -->
-            <div class="glass-ui p-8 group cursor-pointer mt-32">
-                <div class="relative overflow-hidden aspect-square mb-8">
-                    <img src="https://images.unsplash.com/photo-1588099768531-a72d4a198538?auto=format&fit=crop&q=80&w=1000" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
-                </div>
-                <div class="flex justify-between items-end">
-                    <div>
-                        <h3 class="text-2xl font-bold uppercase tracking-tighter">Adidas Yeezy Boost</h3>
-                        <p class="text-xs opacity-40 uppercase tracking-widest mt-2">Premium Culture</p>
-                    </div>
-                    <p class="text-2xl font-light">$340</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- NEW Instagram "Trailer" Section -->
-    <section class="py-40 bg-zinc-950/50 border-y border-white/5">
-        <div class="px-[8%] text-center">
-            <p class="text-orange-500 text-[10px] tracking-[1em] uppercase mb-8">Stay Connected</p>
-            <h2 class="text-6xl md:text-8xl font-black uppercase mb-12">Join the<br>Inner Circle</h2>
-            
-            <div class="flex justify-center">
-                <a href="https://www.instagram.com/abhiiiyyeee._/" target="_blank" class="group relative inline-flex items-center gap-6 px-16 py-8 border border-white/10 glass-ui hover:border-orange-500 transition-all">
-                    <div class="text-left">
-                        <p class="text-[10px] uppercase opacity-50 tracking-[0.3em]">Follow on Instagram</p>
-                        <p class="text-2xl font-bold tracking-tighter">@abhiiiyyeee._</p>
-                    </div>
-                    <div class="w-12 h-12 bg-white text-black rounded-full flex items-center justify-center group-hover:bg-orange-500 group-hover:text-white transition-colors">
-                        →
-                    </div>
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="py-24 px-[8%] border-t border-white/5">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-20">
+    <!-- PRODUCT GRID -->
+    <section class="py-20 px-[8%] min-h-screen" id="store">
+        <div class="flex flex-col md:flex-row justify-between items-end mb-16 gap-4">
             <div>
-                <h2 class="malayalam-brand text-4xl font-bold mb-6">അഭിയുടെ കട</h2>
-                <p class="text-xs text-gray-500 uppercase tracking-widest leading-loose">
-                    Curating worldwide street assets for the local elite. Abhiyude Kada is a registered culture-hub.
-                </p>
-            </div>
-            <div class="flex flex-col gap-4">
-                <h4 class="text-[10px] font-bold text-orange-600 uppercase tracking-[0.4em] mb-4">Navigation</h4>
-                <a href="#" class="text-sm opacity-50 hover:opacity-100 transition">Latest Drop</a>
-                <a href="#" class="text-sm opacity-50 hover:opacity-100 transition">Sizing Guide</a>
-                <a href="#" class="text-sm opacity-50 hover:opacity-100 transition">Shipping Policy</a>
-            </div>
-            <div class="flex flex-col gap-4">
-                <h4 class="text-[10px] font-bold text-orange-600 uppercase tracking-[0.4em] mb-4">Official Handle</h4>
-                <a href="https://www.instagram.com/abhiiiyyeee._/" target="_blank" class="text-sm hover:text-orange-500 transition">Instagram: @abhiiiyyeee._</a>
-                <p class="text-sm opacity-50">WhatsApp: Request Link</p>
+                <h2 class="text-6xl font-black uppercase tracking-tighter" x-text="filter"></h2>
+                <p class="text-orange-500 font-bold text-xs tracking-widest uppercase">Price: ₹1,500.00 INR</p>
             </div>
         </div>
-        <div class="mt-24 pt-10 border-t border-white/5 flex justify-between items-center text-[8px] uppercase tracking-[0.8em] text-gray-700">
-            <p>©2024 ABHIYUDE KADA</p>
-            <p>MALAPPURAM • KERALA • GLOBAL</p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <template x-for="product in filteredProducts" :key="product.id">
+                <div class="glass-panel p-4 group cursor-pointer hover:border-orange-500 transition-all duration-500">
+                    <div class="relative overflow-hidden aspect-square mb-6 bg-zinc-900">
+                        <img :src="product.img" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000">
+                        <div class="absolute top-4 left-4 bg-orange-600 text-[9px] px-3 py-1 font-bold" x-show="product.trending">TRENDING</div>
+                    </div>
+                    <h3 class="text-lg font-bold uppercase tracking-tight" x-text="product.name"></h3>
+                    <p class="text-[10px] opacity-40 uppercase tracking-widest mb-4" x-text="product.type"></p>
+                    <div class="flex justify-between items-center border-t border-white/10 pt-4">
+                        <span class="text-xl font-light">₹1,500</span>
+                        <button @click="addToCart(product)" class="bg-white text-black text-[9px] px-6 py-3 font-black uppercase hover:bg-orange-600 hover:text-white transition">Add To Bag</button>
+                    </div>
+                </div>
+            </template>
         </div>
+    </section>
+
+    <!-- CART SIDEBAR -->
+    <div class="fixed inset-0 z-[2000] bg-black/80 backdrop-blur-md" x-show="cartOpen" x-transition.opacity @click="cartOpen = false"></div>
+    <div class="fixed right-0 top-0 h-full w-full md:w-[450px] bg-zinc-950 z-[2001] p-10 cart-sidebar shadow-2xl" 
+         :class="cartOpen ? 'translate-x-0' : 'translate-x-full'">
+        <div class="flex justify-between items-center mb-10">
+            <h2 class="text-3xl font-black uppercase tracking-tighter">Your Bag</h2>
+            <button @click="cartOpen = false" class="text-xs tracking-widest opacity-50 hover:opacity-100 uppercase">Close</button>
+        </div>
+
+        <div class="space-y-6 overflow-y-auto max-h-[60vh] pr-4">
+            <template x-for="(item, index) in cart" :key="index">
+                <div class="flex gap-4 items-center border-b border-white/5 pb-4">
+                    <img :src="item.img" class="w-20 h-20 object-cover bg-zinc-900">
+                    <div class="flex-1">
+                        <h4 class="text-xs font-bold uppercase" x-text="item.name"></h4>
+                        <p class="text-[10px] text-orange-500 mt-1">₹1,500</p>
+                    </div>
+                    <button @click="removeFromCart(index)" class="text-[10px] opacity-30 hover:opacity-100 uppercase">Remove</button>
+                </div>
+            </template>
+            <template x-if="cart.length === 0">
+                <p class="text-center opacity-30 py-20 uppercase text-xs tracking-widest">Bag is empty</p>
+            </template>
+        </div>
+
+        <div class="absolute bottom-0 left-0 w-full p-10 bg-zinc-950 border-t border-white/10" x-show="cart.length > 0">
+            <div class="flex justify-between mb-6">
+                <span class="text-xs uppercase tracking-widest opacity-50">Subtotal</span>
+                <span class="text-xl font-bold">₹<span x-text="cart.length * 1500"></span></span>
+            </div>
+            <button @click="checkoutMode = true; cartOpen = false" class="w-full bg-white text-black py-5 font-black text-xs uppercase tracking-[0.3em] hover:bg-orange-600 hover:text-white transition">Checkout Now</button>
+        </div>
+    </div>
+
+    <!-- CHECKOUT MODAL -->
+    <div class="fixed inset-0 z-[3000] bg-black p-6 md:p-20 overflow-y-auto" x-show="checkoutMode" x-transition>
+        <div class="max-w-4xl mx-auto">
+            <button @click="checkoutMode = false" class="mb-10 text-orange-500 font-bold uppercase text-[10px] tracking-widest">← Return to Vault</button>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-20">
+                <div>
+                    <h2 class="text-5xl font-black uppercase mb-8 tracking-tighter">Billing Details</h2>
+                    <form class="space-y-6">
+                        <input type="text" placeholder="FULL NAME" class="w-full bg-transparent border-b border-white/20 py-4 focus:border-orange-500 outline-none text-sm">
+                        <input type="email" placeholder="EMAIL ADDRESS" class="w-full bg-transparent border-b border-white/20 py-4 focus:border-orange-500 outline-none text-sm">
+                        <input type="text" placeholder="SHIPPING ADDRESS (KERALA/INDIA)" class="w-full bg-transparent border-b border-white/20 py-4 focus:border-orange-500 outline-none text-sm">
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="text" placeholder="CITY" class="w-full bg-transparent border-b border-white/20 py-4 focus:border-orange-500 outline-none text-sm">
+                            <input type="text" placeholder="PINCODE" class="w-full bg-transparent border-b border-white/20 py-4 focus:border-orange-500 outline-none text-sm">
+                        </div>
+                    </form>
+                </div>
+                <div class="glass-panel p-10 h-fit">
+                    <h3 class="text-xl font-bold mb-6 uppercase">Order Summary</h3>
+                    <div class="space-y-4 mb-8">
+                        <template x-for="item in cart">
+                            <div class="flex justify-between text-xs">
+                                <span class="opacity-60" x-text="item.name"></span>
+                                <span>₹1,500</span>
+                            </div>
+                        </template>
+                    </div>
+                    <div class="border-t border-white/10 pt-6 flex justify-between items-center mb-10">
+                        <span class="font-bold uppercase tracking-widest text-xs">Total Amount</span>
+                        <span class="text-3xl font-black text-orange-500">₹<span x-text="cart.length * 1500"></span></span>
+                    </div>
+                    <button @click="alert('Redirecting to Payment... Order for ' + cart.length + ' items confirmed!')" 
+                            class="w-full bg-orange-600 text-white py-5 font-black uppercase text-xs tracking-widest">Confirm & Pay</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="py-20 px-[8%] border-t border-white/5 text-center">
+        <h2 class="malayalam text-4xl mb-6">അഭിയുടെ കട</h2>
+        <div class="flex justify-center gap-8 mb-10 text-[10px] font-bold uppercase tracking-[0.4em] opacity-40">
+            <a href="https://www.instagram.com/abhiiiyyeee._/" target="_blank">Instagram</a>
+            <span>Twitter</span>
+            <span>WhatsApp</span>
+        </div>
+        <p class="text-[8px] tracking-[1em] text-zinc-600 uppercase">Official Licensed Drops • 2024</p>
     </footer>
 
     <script>
-        gsap.registerPlugin(ScrollTrigger);
-
-        // Hero Reveal
-        gsap.from(".reveal", {
-            y: 80,
-            opacity: 0,
-            duration: 1.5,
-            stagger: 0.2,
-            ease: "power4.out"
-        });
-
-        // Parallax Effect
-        window.addEventListener('scroll', () => {
-            const scroll = window.pageYOffset;
-            document.getElementById('main-bg').style.transform = `translateY(${scroll * 0.4}px)`;
-        });
-
-        // Product Reveal
-        document.querySelectorAll('.glass-ui').forEach(card => {
-            gsap.from(card, {
-                scrollTrigger: {
-                    trigger: card,
-                    start: "top bottom-=100",
-                    toggleActions: "play none none reverse"
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('shop', () => ({
+                filter: 'ALL DROPS',
+                cartOpen: false,
+                checkoutMode: false,
+                bgImage: 'https://images.unsplash.com/photo-1514463738911-56b6a0468071?q=80&w=2000',
+                categories: ['ALL DROPS', 'NIKE DUNK', 'HIGH TOPS', 'LOW TOPS'],
+                catImages: {
+                    'ALL DROPS': 'https://images.unsplash.com/photo-1514463738911-56b6a0468071?q=80&w=2000',
+                    'NIKE DUNK': 'https://images.unsplash.com/photo-1610398041455-2c3683f12458?q=80&w=2000',
+                    'HIGH TOPS': 'https://images.unsplash.com/photo-1587563871167-1ee9c731aefb?q=80&w=2000',
+                    'LOW TOPS': 'https://images.unsplash.com/photo-1605348532760-6753d2c43329?q=80&w=2000'
                 },
-                y: 50,
-                opacity: 0,
-                duration: 1,
-                ease: "power2.out"
-            });
+                products: [
+                    { id: 1, name: "Nike Dunk 'Ghost Rider'", type: "NIKE DUNK", img: "https://images.unsplash.com/photo-1610398041455-2c3683f12458?w=800", trending: true },
+                    { id: 2, name: "Nike Dunk 'AE86' Edition", type: "NIKE DUNK", img: "https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=800", trending: true },
+                    { id: 3, name: "Nike Dunk 'Unhuman' Noir", type: "NIKE DUNK", img: "https://images.unsplash.com/photo-1605348532760-6753d2c43329?w=800", trending: false },
+                    { id: 4, name: "Air Jordan 1 High 'Chicago'", type: "HIGH TOPS", img: "https://images.unsplash.com/photo-1587563871167-1ee9c731aefb?w=800", trending: true },
+                    { id: 5, name: "Nike SB Dunk Low Pro", type: "LOW TOPS", img: "https://images.unsplash.com/photo-1552346154-21d32810aba3?w=800", trending: false },
+                    { id: 6, name: "Nike High-Top 'Volt'", type: "HIGH TOPS", img: "https://images.unsplash.com/photo-1597041066774-5d270d818a48?w=800", trending: false },
+                ],
+                cart: [],
+                get filteredProducts() {
+                    if (this.filter === 'ALL DROPS') return this.products;
+                    return this.products.filter(p => p.type === this.filter);
+                },
+                addToCart(product) {
+                    this.cart.push(product);
+                    this.cartOpen = true;
+                },
+                removeFromCart(index) {
+                    this.cart.splice(index, 1);
+                }
+            }))
         });
+
+        // Cinematic Animations
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.from("#hero-content", { y: 100, opacity: 0, duration: 2, ease: "power4.out" });
     </script>
 </body>
 </html>
